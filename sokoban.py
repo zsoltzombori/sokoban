@@ -3,7 +3,7 @@ from gym_sokoban.envs.sokoban_env_fast import SokobanEnvFast
 
 
 if __name__ == "__main__":
-    dim_room = (7, 7)
+    dim_room = (8, 8)
     num_boxes = 2
     env = SokobanEnvFast(dim_room=dim_room, num_boxes=num_boxes)
     # The encoding of the board is described in README
@@ -12,6 +12,7 @@ if __name__ == "__main__":
     wall = board[:,:,0] # this is a one-hot encoding of walls
     # For readibility first we deal with tops and then with rights
     print("Walls {}".format(wall))
+    print("Walls shape {}".format(wall.shape))
     tops = []
     for i in range(dim_room[0]):
         for j in range(dim_room[1]-1):
@@ -25,6 +26,8 @@ if __name__ == "__main__":
                 rights.append("right(x{}y{},x{}y{})".format(i,j,i+1,j))
 
     boxes_initial_locations = board[:,:,4]
+    print("boxes_initial_locations {}".format(boxes_initial_locations))
+    print("boxes_initial_locations shape {}".format(boxes_initial_locations.shape))
     boxes_initial = []
     for i in range(dim_room[0]):
         for j in range(dim_room[1]):
@@ -32,6 +35,8 @@ if __name__ == "__main__":
                 boxes_initial.append("box(x{}y{})".format(i,j))
 
     boxes_target_locations = board[:,:,2]
+    print("boxes_target_locations {}".format(boxes_target_locations))
+    print("boxes_target_locations shape {}".format(boxes_target_locations.shape))
     boxes_target = []
     for i in range(dim_room[0]):
         for j in range(dim_room[1]):
@@ -40,6 +45,8 @@ if __name__ == "__main__":
 
 
     sokoban_initial_location = board[:,:,5]
+    print("sokoban_initial_location {}".format(sokoban_initial_location))
+    print("sokoban_initial_location shape {}".format(sokoban_initial_location.shape))
     for i in range(dim_room[0]):
         for j in range(dim_room[1]):
             if sokoban_initial_location[i,j] == 1:
