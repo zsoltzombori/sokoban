@@ -44,7 +44,7 @@ if __name__ == "__main__":
                 boxes_target.append("solution(x{}y{})".format(i,j))
 
 
-    sokoban_initial_location = board[:,:,5]
+    sokoban_initial_location = board[:,:,5] + board[:,:,6]
     print("sokoban_initial_location {}".format(sokoban_initial_location))
     print("sokoban_initial_location shape {}".format(sokoban_initial_location.shape))
     for i in range(dim_room[0]):
