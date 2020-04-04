@@ -11,6 +11,7 @@ if __name__ == "__main__":
 
     wall = board[:,:,0] # this is a one-hot encoding of walls
     # For readibility first we deal with tops and then with rights
+    print("Walls {}".format(wall))
     tops = []
     for i in range(dim_room[0]):
         for j in range(dim_room[1]-1):
@@ -30,11 +31,11 @@ if __name__ == "__main__":
             if boxes_initial_locations[i,j] == 1:
                 boxes_initial.append("box(x{}y{})".format(i,j))
 
-    boxes_target_locations = board[:,:,4]
+    boxes_target_locations = board[:,:,2]
     boxes_target = []
     for i in range(dim_room[0]):
         for j in range(dim_room[1]):
-            if boxes_initial_locations[i,j] == 1:
+            if boxes_target_locations[i,j] == 1:
                 boxes_target.append("solution(x{}y{})".format(i,j))
 
 
