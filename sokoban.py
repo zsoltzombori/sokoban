@@ -22,7 +22,7 @@ if __name__ == "__main__":
     rights = []
     for i in range(dim_room[0]-1):
         for j in range(dim_room[1]):
-            if wall[i,j] == 0 and wall[i,j+1] == 0:
+            if wall[i,j] == 0 and wall[i+1,j] == 0:
                 rights.append("right(x{}y{},x{}y{})".format(i,j,i+1,j))
 
     boxes_initial_locations = board[:,:,4]
@@ -78,7 +78,10 @@ if __name__ == "__main__":
                                                       boxes_initial_string,
                                                       boxes_target_string,
                                                       sokoban_string)
+
+    print(query)
     result=list(prolog.query(query))
+    print("Number of solutions:", len(result))
 
     for i, r in enumerate(result):
         solution = r['Solution']
