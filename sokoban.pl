@@ -84,6 +84,7 @@ solve(Problem, Solution):-
     retractall(initial_state(_,_)),
     findall(Box, member(box(Box), Boxes), BoxLocs),
     assert(initial_state(sokoban, state(Sokoban, BoxLocs))),
+    display_board(8),
     solve_problem(sokoban, Solution).
     
 display_board(Size):-
