@@ -60,14 +60,14 @@ all_boxes_in_solution([Box|Boxes]) :-
 /* Some position for boxes must be avoided (unless they are solutions)     */
 /* because the Sokoban won't be able to move them further:                 */
 /*  - corners: the Sokoban can't move a box which is placed at a corner.   */
-:- table stuck/1.
+% :- table stuck/1.
 stuck(X) :-
     \+ solution(X),
     corner(X).
 
 /*  - horizontally adjacent boxes can only be moved up or down... if there */
 /*    are empty squares for the Sokoban to push and for the boxes to move. */
-:- table stuck/2.
+% :- table stuck/2.
 stuck(X, Y) :-
     (right(X,Y); right(Y,X)),
     (\+ solution(X); \+ solution(Y)),
@@ -89,17 +89,17 @@ stuck(X, Y) :-
 
 /* The Sokoban can move to any empty position in the board, but cannot go  */
 /* through boxes.                                                          */
-:- table can_reach/4.
-can_reach(P1, P1, _Boxes, _Visited).
+% :- table can_reach/4.
+can_reach(P1, P1, _Boxes, _Visited):- !.
 can_reach(P1, P2, Boxes, _Visited) :-
     neib(P1, P2, _),
-    \+ member(P2, Boxes).
+    \+ member(P2, Boxes), !.
 can_reach(P1, P2, Boxes, Visited) :-
     neib(P1, P3, _),
     P3 \== P2,
     \+ member(P3, Visited),
     \+ member(P3, Boxes),
-    can_reach(P3, P2, Boxes, [P3|Visited]).
+    can_reach(P3, P2, Boxes, [P3|Visited]), !.
 
 /* A good place to move a box is one that:                                 */
 /*  - is not already occupied by a box.                                    */

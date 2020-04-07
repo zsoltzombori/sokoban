@@ -78,7 +78,10 @@ if __name__ == "__main__":
                                                       boxes_initial_string,
                                                       boxes_target_string,
                                                       sokoban_string)
+
+    print(query)
     result=list(prolog.query(query))
+    print("Number of solutions:", len(result))
 
     for i, r in enumerate(result):
         solution = r['Solution']

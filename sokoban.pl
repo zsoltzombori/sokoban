@@ -69,6 +69,7 @@ problem([[top(x1y1,x1y2),
           solution(x3y1)],
          sokoban(x1y1)]).
 
+problem2([[top(x2y1,x2y2),top(x2y2,x2y3),top(x3y1,x3y2),top(x3y2,x3y3),top(x4y1,x4y2),top(x5y1,x5y2),top(x5y2,x5y3),top(x5y5,x5y6),top(x6y1,x6y2),top(x6y2,x6y3),top(x6y3,x6y4),top(x6y4,x6y5),top(x6y5,x6y6)],[right(x2y1,x3y1),right(x2y2,x3y2),right(x3y1,x4y1),right(x3y2,x4y2),right(x4y1,x5y1),right(x5y1,x6y1),right(x5y2,x6y2),right(x5y5,x6y5),right(x6y1,x7y1),right(x6y2,x7y2),right(x6y3,x7y3),right(x6y4,x7y4),right(x6y5,x7y5)],[box(x3y2),box(x5y2)],[solution(x2y3),solution(x6y6)],sokoban(x4y1)]).
 
 solve(Problem, Solution):-
     Problem = [Tops, Rights, Boxes, Solutions, sokoban(Sokoban)],
@@ -84,6 +85,31 @@ solve(Problem, Solution):-
     findall(Box, member(box(Box), Boxes), BoxLocs),
     assert(initial_state(sokoban, state(Sokoban, BoxLocs))),
     solve_problem(sokoban, Solution).
+    
+display_board(Size):-
+    write("  "), foreach(between(1,Size,X), format("~w ", [X])), writeln(""),
+    write("  "), foreach(between(1,Size,_), write("_ ")), writeln(""),
+    foreach(between(1,Size,Y0), display_line(Size, Y0)).
+
+display_line(Size,Y0):-
+    Y is Size-Y0 + 1,
+    format("~w|", [Y]),
+    foreach(between(1,Size,X), (
+                display_cell(X,Y)
+            )),
+    writeln("").
+
+
+display_cell(X,Y):-
+    format(atom(Loc), "x~wy~w", [X,Y]),
+    initial_state(_, state(Sokoban, Boxes)),
+    ( Loc = Sokoban -> write("S")
+    ; member(Loc, Boxes) -> write("B")
+    ; solution(Loc) -> write("X")
+    ; top(_, Loc) -> write(" ")
+    ; write("_")
+    ),
+    ( right(Loc,_) -> write(" ") ; write("|") ).    
     
     
 
