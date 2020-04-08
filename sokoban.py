@@ -1,10 +1,10 @@
 from pyswip import Prolog
 from gym_sokoban.envs.sokoban_env_fast import SokobanEnvFast
+import time
 
+def find_solution(size=8, num_boxes=2, time_limit=10):
+    dim_room = (size, size)
 
-if __name__ == "__main__":
-    dim_room = (8, 8)
-    num_boxes = 2
     env = SokobanEnvFast(dim_room=dim_room, num_boxes=num_boxes)
     # The encoding of the board is described in README
     board = env.reset()
@@ -43,7 +43,6 @@ if __name__ == "__main__":
             if boxes_target_locations[i,j] == 1:
                 boxes_target.append("solution(x{}y{})".format(i,j))
 
-
     sokoban_initial_location = board[:,:,5] + board[:,:,6]
     print("sokoban_initial_location {}".format(sokoban_initial_location))
     print("sokoban_initial_location shape {}".format(sokoban_initial_location.shape))
@@ -64,25 +63,37 @@ if __name__ == "__main__":
     print("Boxes target locations {}".format(boxes_target_string))
     print("Sokoban initial location {}".format(sokoban_string))
 
-    # tops = "[top(x1y1,x1y2),top(x1y2,x1y3),top(x2y1,x2y2),top(x2y2,x2y3),top(x3y1,x3y2),top(x3y2,x3y3)]"
-    # rights = "[right(x1y3, x2y3),right(x2y3, x3y3),right(x1y2, x2y2),right(x2y2, x3y2),right(x1y1, x2y1),right(x2y1, x3y1)]"
-    # boxes = "[box(x2y2),box(x3y2)]"
-    # solutions = "[solution(x2y1),solution(x3y1)]"
-    # sokoban = "sokoban(x1y1)"
-
-
     prolog = Prolog()
     prolog.consult("sokoban.pl")
-    query = "solve([{},{},{},{},{}],Solution)".format(tops_string,
-                                                      rights_string,
-                                                      boxes_initial_string,
-                                                      boxes_target_string,
-                                                      sokoban_string)
+    query = "call_with_time_limit({},solve([{},{},{},{},{}],Solution))".format(time_limit,
+                                                                               tops_string,
+                                                                               rights_string,
+                                                                               boxes_initial_string,
+                                                                               boxes_target_string,
+                                                                               sokoban_string)
 
     print(query)
-    result=list(prolog.query(query))
-    print("Number of solutions:", len(result))
+    try:
+        return list(prolog.query(query))
+    except:
+        return None
 
-    for i, r in enumerate(result):
-        solution = r['Solution']
-        print("Solution {}:\n{}".format(i, solution))
+
+if __name__ == "__main__":
+
+    number_of_trials = 100
+    time_start = time.time()
+
+    results = []
+    for i in range(number_of_trials):
+        result = find_solution(size=10, num_boxes=2, time_limit=5)
+        if result is not None:
+            results.append(result)
+
+    for result in results:
+        for i, r in enumerate(result):
+            solution = r['Solution']
+            print("Solution {}:\n{}".format(i, solution))
+
+    print("Number of solutions: {}".format(len(results)))
+    print("Total time: {}".format(time.time() - time_start))
