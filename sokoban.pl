@@ -20,9 +20,9 @@ solve_dfs(Problem, State, _History, []) :-
     final_state(Problem, State), !.
 
 /* If not, we have to explore new states                                   */
-solve_dfs(Problem, State, History, [Move|Moves]) :-
-    movement(State, Move),
-    update(State, Move, NewState),
+solve_dfs(Problem, State, History, [[BoxMove,SokobanMoves]|Moves]) :-
+    movement(State, BoxMove, SokobanMoves),
+    update(State, BoxMove, NewState),
     \+ member(NewState, History),   /* No quiero ciclos en el grafo de búsqueda */
     solve_dfs(Problem, NewState, [NewState|History], Moves).
 
@@ -84,8 +84,15 @@ solve(Problem, Solution):-
     retractall(initial_state(_,_)),
     findall(Box, member(box(Box), Boxes), BoxLocs),
     assert(initial_state(sokoban, state(Sokoban, BoxLocs))),
-    display_board(8),
+    display_board(9),
     solve_problem(sokoban, Solution).
+%% convert_solution(Solution0, Solution).
+
+convert_solution([],[]).
+convert_solution([[move(Box,Dir),SokobanMoves]|As],[[[Box2,Dir2],SokobanMoves]|Bs]):-
+    atom_string(Box, Box2),
+    atom_string(Dir, Dir2),
+    convert_solution(As, Bs).
     
 display_board(Size):-
     write("  "), foreach(between(1,Size,X), format("~w ", [X])), writeln(""),
