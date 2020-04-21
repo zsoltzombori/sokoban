@@ -16,7 +16,7 @@ def flatten(container):
 def find_solution(size=8, num_boxes=2, time_limit=10):
     dim_room = (size, size)
 
-    env = SokobanEnvFast(dim_room=dim_room, num_boxes=num_boxes)
+    env = SokobanEnvFast(dim_room=dim_room, num_boxes=num_boxes, seed=0)
     # The encoding of the board is described in README
     board = env.reset()
 
@@ -124,13 +124,13 @@ def find_solution(size=8, num_boxes=2, time_limit=10):
 
 def map_moves(move):
     if move == "up":
-        return 0
-    elif move == "down":
-        return 1
-    elif move == "left":
-        return 2
-    elif move == "right":
         return 3
+    elif move == "down":
+        return 2
+    elif move == "left":
+        return 0
+    elif move == "right":
+        return 1
 
 
 if __name__ == "__main__":
@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
     results = []
     for i in range(number_of_trials):
-        result = find_solution(size=5, num_boxes=2, time_limit=5)
+        result = find_solution(size=8, num_boxes=2, time_limit=20)
         if result is not None:
             results.append(result)
 
