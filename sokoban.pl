@@ -20,11 +20,12 @@ solve_dfs(Problem, State, _History, []) :-
     final_state(Problem, State), !.
 
 /* If not, we have to explore new states                                   */
-solve_dfs(Problem, State, History, [[BoxMove,SokobanMoves]|Moves]) :-
+solve_dfs(Problem, State, History, Moves):-
     movement(State, BoxMove, SokobanMoves),
+    append([SokobanMoves,[BoxMove],Moves2], Moves),
     update(State, BoxMove, NewState),
     \+ member(NewState, History),   /* No quiero ciclos en el grafo de búsqueda */
-    solve_dfs(Problem, NewState, [NewState|History], Moves).
+    solve_dfs(Problem, NewState, [NewState|History], Moves2).
 
 /* Actually solve the problem                                              */
 solve_problem(Problem, Solution) :-

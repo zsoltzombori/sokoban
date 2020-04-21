@@ -97,7 +97,6 @@ def find_solution(size=8, num_boxes=2, time_limit=10):
       6*board[:,:,6])
     for i, r in enumerate(result):
         solution = r['Solution']
-        solution = list(flatten(solution))
         actions = []
         print("Solution {}: {}".format(i, solution))
         for index in range(len(solution)):

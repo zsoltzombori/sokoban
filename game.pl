@@ -112,7 +112,7 @@ good_move(X, Boxes) :-
 /* Selection of a good movement given a state:                             */
 /*  - any valid movement for every box                                     */
 /*  - the Sokoban must be able to access the push position                 */
-movement(state(Sokoban, Boxes), move(Box, Dir), SokobanMoves) :-
+movement(state(Sokoban, Boxes), push(Box, Dir), SokobanMoves) :-
     select(Box, Boxes, BoxesRemain),
     neib(Box, NextLoc, Dir),
     good_move(NextLoc, BoxesRemain),
@@ -124,7 +124,7 @@ movement(state(Sokoban, Boxes), move(Box, Dir), SokobanMoves) :-
 /***************************************************************************/
 /* Implementation of the state update functionality.                       */
 /***************************************************************************/
-update(state(_Sokoban, Boxes), move(Box, Dir), state(NewSokoban, NewBoxes)) :-
+update(state(_Sokoban, Boxes), push(Box, Dir), state(NewSokoban, NewBoxes)) :-
     NewSokoban = Box,
     subtract(Boxes, [Box], TempList),
     neib(Box, NewPosition, Dir),
