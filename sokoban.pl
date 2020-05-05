@@ -20,21 +20,17 @@ solve_dfs(Problem, State, _History, []) :-
     final_state(Problem, State), !.
 
 /* If not, we have to explore new states                                   */
-solve_dfs(Problem, State, History, Moves):-
+solve_dfs(State, History, Moves):-
     movement(State, BoxMove, SokobanMoves),
     append([SokobanMoves,[BoxMove],Moves2], Moves),
     update(State, BoxMove, NewState),
     \+ member(NewState, History),   /* No quiero ciclos en el grafo de búsqueda */
-    solve_dfs(Problem, NewState, [NewState|History], Moves2).
+    solve_dfs(NewState, [NewState|History], Moves2).
 
 /* Actually solve the problem                                              */
-solve_problem(Problem, Solution) :-
-    format('=============~n'),
-    format('|| Problem: ~w~n', Problem),
-    format('=============~n'),
-    initial_state(Problem, Initial),
-    format('Initial state: ~w~n', Initial),
-    solve_dfs(Problem, Initial, [Initial], Solution).
+solve_problem(State, Solution) :-
+    format('Initial state: ~w~n', State),
+    solve_dfs(State, [State], Solution).
 
 
 /***************************************************************************/
@@ -72,46 +68,61 @@ problem([[top(x1y1,x1y2),
 
 problem2([[top(x2y1,x2y2),top(x2y2,x2y3),top(x3y1,x3y2),top(x3y2,x3y3),top(x4y1,x4y2),top(x5y1,x5y2),top(x5y2,x5y3),top(x5y5,x5y6),top(x6y1,x6y2),top(x6y2,x6y3),top(x6y3,x6y4),top(x6y4,x6y5),top(x6y5,x6y6)],[right(x2y1,x3y1),right(x2y2,x3y2),right(x3y1,x4y1),right(x3y2,x4y2),right(x4y1,x5y1),right(x5y1,x6y1),right(x5y2,x6y2),right(x5y5,x6y5),right(x6y1,x7y1),right(x6y2,x7y2),right(x6y3,x7y3),right(x6y4,x7y4),right(x6y5,x7y5)],[box(x3y2),box(x5y2)],[solution(x2y3),solution(x6y6)],sokoban(x4y1)]).
 
-solve(Problem, Solution):-
-    Problem = [Tops, Rights, Boxes, Solutions, sokoban(Sokoban)],
+init(State):-
+    problem2([Tops,Rights,Boxes,Solutions,sokoban(Sokoban)]),
+    init_board(Tops, Rights, Solutions),
+    findall(Box, member(box(Box), Boxes), BoxLocs),
+    State = state(Sokoban, BoxLocs),
+    display_board(9, State).
+
+init_board(Tops, Rights, Solutions):-
     abolish_all_tables,
     retractall(top(_,_)),
     findall(_, ( member(P, Tops), assert(P) ), _),
     retractall(right(_,_)),
     findall(_, ( member(P, Rights), assert(P) ), _),
     retractall(solution(_)),
-    findall(_, ( member(P, Solutions), assert(P) ), _),
+    findall(_, ( member(P, Solutions), assert(P) ), _).
     
-    retractall(initial_state(_,_)),
-    findall(Box, member(box(Box), Boxes), BoxLocs),
-    assert(initial_state(sokoban, state(Sokoban, BoxLocs))),
-    display_board(9),
-    solve_problem(sokoban, Solution).
-%% convert_solution(Solution0, Solution).
 
-convert_solution([],[]).
-convert_solution([[move(Box,Dir),SokobanMoves]|As],[[[Box2,Dir2],SokobanMoves]|Bs]):-
-    atom_string(Box, Box2),
-    atom_string(Dir, Dir2),
-    convert_solution(As, Bs).
+solve(Problem, Solution):-
+    Problem = [Tops, Rights, Boxes, Solutions, sokoban(Sokoban)],
+    init_board(Tops, Rights, Solutions),
+
+    findall(Box, member(box(Box), Boxes), BoxLocs),
+    State = state(Sokoban, BoxLocs),
+    display_board(9, State),
+    solve_problem(State, Solution).
+
+step(sokoban(Dir), state(Sokoban, Boxes), state(NextLoc, Boxes), Steps):-
+    neib(Sokoban,NextLoc,Dir),
+    can_reach(Sokoban,NextLoc, Boxes, [], Steps), !.
+step(push(BoxLoc,Dir), State, NewState, Steps):-
+    movement(State, push(BoxLoc,Dir), SokobanMoves),
+    append(SokobanMoves, [push(BoxLoc,Dir)], Steps),
+    update(State, push(BoxLoc,Dir), NewState), !.
+step(pushSequence(BoxLoc,TargetLoc), State, NewState, Steps):-
+    pushSequence(State, BoxLoc, TargetLoc, [], NewState, Steps), !.
+% step(moveBox(BoxLoc,TargetLoc), State, NewState, Steps):-
     
-display_board(Size):-
+
+    
+display_board(Size, State):-
     write("  "), foreach(between(1,Size,X), format("~w ", [X])), writeln(""),
     write("  "), foreach(between(1,Size,_), write("_ ")), writeln(""),
-    foreach(between(1,Size,Y0), display_line(Size, Y0)).
+    foreach(between(1,Size,Y0), display_line(Size, Y0, State)).
 
-display_line(Size,Y0):-
+display_line(Size,Y0,State):-
     Y is Size-Y0 + 1,
     format("~w|", [Y]),
     foreach(between(1,Size,X), (
-                display_cell(X,Y)
+                display_cell(X,Y,State)
             )),
     writeln("").
 
 
-display_cell(X,Y):-
+display_cell(X,Y,state(Sokoban, Boxes)):-
     format(atom(Loc), "x~wy~w", [X,Y]),
-    initial_state(_, state(Sokoban, Boxes)),
     ( Loc = Sokoban -> write("S")
     ; member(Loc, Boxes) -> write("B")
     ; solution(Loc) -> write("X")

@@ -120,6 +120,15 @@ movement(state(Sokoban, Boxes), push(Box, Dir), SokobanMoves) :-
     can_reach(Sokoban, PushPosition, Boxes, [], SokobanMoves), /* Enable this rule to consider Sokoban movement constraint */
     \+ member(PushPosition, Boxes).
 
+% All moves target the same box
+pushSequence(State, TargetLoc, TargetLoc, _, State, []):- !.
+pushSequence(State, BoxLoc, TargetLoc, History, NewState, Steps):-
+    \+ member(State, History),
+    neib(BoxLoc,NextLoc,Dir),
+    movement(State, push(BoxLoc, Dir), SokobanMoves),
+    append([SokobanMoves, [push(BoxLoc, Dir)], Steps2], Steps),
+    update(State, push(BoxLoc, Dir), State2),
+    pushSequence(State2, NextLoc, TargetLoc, [State|History], NewState, Steps2).
 
 /***************************************************************************/
 /* Implementation of the state update functionality.                       */
