@@ -16,13 +16,14 @@
 /***************************************************************************/
 
 /* The problem is solved if the state is equal to final_state.             */
-solve_dfs(Problem, State, _History, []) :-
-    final_state(Problem, State), !.
+solve_dfs(State, _History, []) :-
+    final_state(State), !.
 
 /* If not, we have to explore new states                                   */
 solve_dfs(State, History, Moves):-
     movement(State, BoxMove, SokobanMoves),
-    append([SokobanMoves,[BoxMove],Moves2], Moves),
+    append(SokobanMoves,[BoxMove], CurrentMoves),
+    append(CurrentMoves, Moves2, Moves),
     update(State, BoxMove, NewState),
     \+ member(NewState, History),   /* No quiero ciclos en el grafo de búsqueda */
     solve_dfs(NewState, [NewState|History], Moves2).
@@ -66,10 +67,11 @@ problem([[top(x1y1,x1y2),
           solution(x3y1)],
          sokoban(x1y1)]).
 
-problem2([[top(x2y1,x2y2),top(x2y2,x2y3),top(x3y1,x3y2),top(x3y2,x3y3),top(x4y1,x4y2),top(x5y1,x5y2),top(x5y2,x5y3),top(x5y5,x5y6),top(x6y1,x6y2),top(x6y2,x6y3),top(x6y3,x6y4),top(x6y4,x6y5),top(x6y5,x6y6)],[right(x2y1,x3y1),right(x2y2,x3y2),right(x3y1,x4y1),right(x3y2,x4y2),right(x4y1,x5y1),right(x5y1,x6y1),right(x5y2,x6y2),right(x5y5,x6y5),right(x6y1,x7y1),right(x6y2,x7y2),right(x6y3,x7y3),right(x6y4,x7y4),right(x6y5,x7y5)],[box(x3y2),box(x5y2)],[solution(x2y3),solution(x6y6)],sokoban(x4y1)]).
+problem2([[top(x2y3,x2y4),top(x3y1,x3y2),top(x3y2,x3y3),top(x3y3,x3y4),top(x4y1,x4y2),top(x4y2,x4y3),top(x4y3,x4y4)],[right(x2y3,x3y3),right(x2y4,x3y4),right(x3y1,x4y1),right(x3y2,x4y2),right(x3y3,x4y3),right(x3y4,x4y4)],[box(x3y3),box(x4y3)],[solution(x2y3),solution(x4y1)],sokoban(x3y4)]).
 
-init(State):-
-    problem2([Tops,Rights,Boxes,Solutions,sokoban(Sokoban)]),
+
+init(Problem, State):-
+    Problem = [Tops, Rights, Boxes, Solutions, sokoban(Sokoban)],
     init_board(Tops, Rights, Solutions),
     findall(Box, member(box(Box), Boxes), BoxLocs),
     State = state(Sokoban, BoxLocs),
@@ -86,12 +88,7 @@ init_board(Tops, Rights, Solutions):-
     
 
 solve(Problem, Solution):-
-    Problem = [Tops, Rights, Boxes, Solutions, sokoban(Sokoban)],
-    init_board(Tops, Rights, Solutions),
-
-    findall(Box, member(box(Box), Boxes), BoxLocs),
-    State = state(Sokoban, BoxLocs),
-    display_board(9, State),
+    init(Problem, State),
     solve_problem(State, Solution).
 
 step(sokoban(Dir), state(Sokoban, Boxes), state(NextLoc, Boxes), Steps):-

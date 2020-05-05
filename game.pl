@@ -42,7 +42,7 @@
 
 /* The puzzle is solved when all boxes are in a solution position, this is */
 /* the final_state.                                                        */
-final_state(sokoban, state(_Sokoban, Boxes)) :-
+final_state(state(_Sokoban, Boxes)) :-
     all_boxes_in_solution(Boxes), !.
 
 /* All boxes are in a the solution position when each one of them is at a  */
@@ -126,7 +126,8 @@ pushSequence(State, BoxLoc, TargetLoc, History, NewState, Steps):-
     \+ member(State, History),
     neib(BoxLoc,NextLoc,Dir),
     movement(State, push(BoxLoc, Dir), SokobanMoves),
-    append([SokobanMoves, [push(BoxLoc, Dir)], Steps2], Steps),
+    append(SokobanMoves, [push(BoxLoc, Dir)], CurrentSteps),
+    append(CurrentSteps, Steps2, Steps),
     update(State, push(BoxLoc, Dir), State2),
     pushSequence(State2, NextLoc, TargetLoc, [State|History], NewState, Steps2).
 
