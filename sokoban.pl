@@ -69,6 +69,21 @@ problem([[top(x1y1,x1y2),
 
 problem2([[top(x2y3,x2y4),top(x3y1,x3y2),top(x3y2,x3y3),top(x3y3,x3y4),top(x4y1,x4y2),top(x4y2,x4y3),top(x4y3,x4y4)],[right(x2y3,x3y3),right(x2y4,x3y4),right(x3y1,x4y1),right(x3y2,x4y2),right(x3y3,x4y3),right(x3y4,x4y4)],[box(x3y3),box(x4y3)],[solution(x2y3),solution(x4y1)],sokoban(x3y4)]).
 
+problem3([[top(x4y1,x4y2),top(x4y2,x4y3),top(x4y3,x4y4),top(x4y4,x4y5),top(x4y5,x4y6),top(x5y1,x5y2),top(x5y2,x5y3),top(x5y3,x5y4),top(x5y4,x5y5),top(x5y5,x5y6),top(x6y1,x6y2),top(x6y2,x6y3),top(x6y3,x6y4),top(x6y4,x6y5),top(x6y5,x6y6)],[right(x3y3,x4y3),right(x3y6,x4y6),right(x4y1,x5y1),right(x4y2,x5y2),right(x4y3,x5y3),right(x4y4,x5y4),right(x4y5,x5y5),right(x4y6,x5y6),right(x5y1,x6y1),right(x5y2,x6y2),right(x5y3,x6y3),right(x5y4,x6y4),right(x5y5,x6y5),right(x5y6,x6y6)],[box(x4y4),box(x5y5)],[solution(x4y2),solution(x5y1)],sokoban(x4y6)]).
+
+t:-
+    problem3(P),
+    init(P, State),
+    State=state(_, Boxes),
+    member(B1, Boxes),
+    solution(S1),
+    step(pushSequence(B1,S1),State, State2, Steps1),
+    display_board(9,State2),
+    State2=state(_, Boxes2),
+    member(B2, Boxes2),
+    solution(S2),
+    step(pushSequence(B2,S2),State2, State3, Steps2),
+    display_board(9,State3).
 
 init(Problem, State):-
     Problem = [Tops, Rights, Boxes, Solutions, sokoban(Sokoban)],
